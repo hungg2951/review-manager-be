@@ -10,6 +10,7 @@ import { ReviewModule } from './review/review.module';
 import { ReviewImageModule } from './review-image/review-image.module';
 import { ReviewSyncProcessorModule } from './review-sync/review-sync-processor.module';
 import { UploadModule } from './upload/upload.module.js';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { UploadModule } from './upload/upload.module.js';
     ReviewModule,
     ReviewImageModule,
     ReviewSyncProcessorModule,
-    UploadModule
+    UploadModule,
+    WebhooksModule
   ],
   controllers: [AppController],
   providers: [AppService],
