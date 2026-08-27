@@ -85,11 +85,16 @@ export class ShopService {
   }
 
   /**
-   * Delete a shop. Throws 404 if not found.
-   */
-  async remove(id: string): Promise<{ id: string; deleted: true }> {
++  * "Xoá" shop khỏi UI — thực chất chỉ đánh dấu is_active = false, KHÔNG
++  * xoá cứng record, để giữ nguyên lịch sử review liên kết với shop này.
++  * Access token cũ vẫn còn hiệu lực bên Shopify cho tới khi merchant tự
++  * gỡ app hoặc admin bật lại (is_active = true) qua reconnect.
++  */
+  async remove(id: string): Promise<{ id: string; deactivated: true }> {
     const result = await pool.query(
-      `DELETE FROM "shops" WHERE "id" = $1 RETURNING "id"`,
+      `UPDATE "shops" SET "is_active" = false, "updated_at" = now()
+      WHERE "id" = $1
+      RETURNING "id"`,
       [id],
     );
 
@@ -97,7 +102,7 @@ export class ShopService {
       throw new NotFoundException(`Shop with id "${id}" not found`);
     }
 
-    return { id, deleted: true };
+    return { id, deactivated: true };
   }
 
   /**
