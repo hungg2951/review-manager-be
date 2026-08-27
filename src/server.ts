@@ -4,7 +4,6 @@ import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { checkSystemHealth } from './health/health-check';
-import * as express from 'express';
 
 async function bootstrap() {
   const PORT = process.env.PORT ?? 3000;
@@ -12,21 +11,11 @@ async function bootstrap() {
   // Run health checks for database dependencies
   await checkSystemHealth();
 
-  // Initialize server
-  const app = await NestFactory.create(AppModule);
+  // Initialize server — rawBody: true để NestJS tự lưu raw body,
+  // dùng cho verify HMAC webhook mà không cần tự chèn middleware Express
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.use(cookieParser());
-
-  // Lưu lại raw body cho webhook routes (cần để verify HMAC chính xác,
-  // vì chữ ký Shopify tính trên raw bytes, không phải JSON đã parse).
-  app.use(
-    '/webhooks',
-    express.json({
-      verify: (req: any, _res, buf) => {
-        req.rawBody = buf;
-      },
-    }),
-  );
 
   const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
     .split(',')
@@ -43,6 +32,7 @@ async function bootstrap() {
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-shop-id'],
   });
 
   await app.listen(PORT);
