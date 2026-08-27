@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ShopifyOAuthService } from './shopify-oauth.service.js';
-import { Public } from 'src/auth/public.decorator.js';
+import { Public } from '../auth/public.decorator.js';
 
 @Public()
 @Controller('auth')

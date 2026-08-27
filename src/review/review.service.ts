@@ -6,7 +6,6 @@ import {
   UpdateReviewSyncStateDto,
 } from './review.dto.js';
 import { ReviewSyncProducerService } from '../review-sync/review-sync.producer.js';
-import { JwtPayload } from 'src/common/decorators/user.decorator.js';
 
 export interface FindAllReviewsQuery {
   shopify_product_id?: string;
