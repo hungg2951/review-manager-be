@@ -118,6 +118,9 @@
                     <span class='rw-verified'>✓ Verified</span>
                   {% endif %}
                 </div>
+                {% if review.created_at.value != blank %}
+                  <div class='rw-item-date'>{{ review.created_at.value | date: '%m/%d/%Y' }}</div>
+                {% endif %}
               </div>
             </div>
             <span class='rw-stars' aria-hidden='true'>

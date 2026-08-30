@@ -23,6 +23,7 @@ export const REVIEW_METAOBJECT_FIELD_KEYS = {
   source: 'source',
   product: 'product', // field kiểu product_reference
   images: 'images', // field kiểu list.file_reference
+  createdAt: 'created_at',
 } as const;
 
 export const REVIEW_SYNC_JOB_OPTIONS = {

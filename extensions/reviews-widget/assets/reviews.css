@@ -36,7 +36,7 @@
 /* ─── Container chính — full width theo khối cha ─── */
 .rw-main {
   width: 100%;
-  max-width: 1200PX;
+  max-width: 1200px;
   box-sizing: border-box;
   margin: 32px auto;
   color: var(--rw-color-text);
@@ -206,7 +206,9 @@
   background: var(--rw-color-bg);
   color: var(--rw-color-text);
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 .rw-icon-btn:hover {
   border-color: var(--rw-color-primary);
@@ -316,13 +318,13 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--rw-color-bg-muted);
+  background: var(--rw-color-primary);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--rw-color-text);
+  font-weight: 700;
   flex-shrink: 0;
 }
 .rw-author-name {
@@ -333,6 +335,11 @@
   font-size: var(--rw-font-size-xs);
   color: var(--rw-color-verified);
   font-weight: 500;
+}
+.rw-item-date {
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-text-muted);
+  margin-top: 2px;
 }
 .rw-item-title {
   font-weight: 600;

@@ -180,6 +180,10 @@ export class ReviewSyncProcessor extends WorkerHost {
         key: REVIEW_METAOBJECT_FIELD_KEYS.product,
         value: this.toProductGid(review.shopify_product_id),
       },
+      {
+        key: REVIEW_METAOBJECT_FIELD_KEYS.createdAt,
+        value: new Date(review.created_at).toISOString(),
+      }
     ];
 
     if (review.author_name) {
