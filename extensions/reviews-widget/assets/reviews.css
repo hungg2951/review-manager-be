@@ -101,6 +101,12 @@
   fill: var(--rw-color-star-empty);
   flex-shrink: 0;
 }
+.rw-star-partial-fill {
+  stop-color: var(--rw-color-star);
+}
+.rw-star-partial-empty {
+  stop-color: var(--rw-color-star-empty);
+}
 .rw-star--sm {
   width: 16px;
   height: 16px;

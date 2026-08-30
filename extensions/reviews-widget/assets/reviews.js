@@ -1,3 +1,111 @@
+let rwGradIdCounter = 0;
+
+function renderPartialStars(avg, sizeClass) {
+  let html = '';
+  for (let i = 1; i <= 5; i++) {
+    const diff = avg - i + 1;
+    let fillPercent;
+    if (diff >= 1) fillPercent = 100;
+    else if (diff <= 0) fillPercent = 0;
+    else fillPercent = Math.round(diff * 100);
+
+    const gradId = `rw-dyn-grad-${rwGradIdCounter++}`;
+    html += `
+      <svg class="rw-star${sizeClass ? ' ' + sizeClass : ''}" viewBox="0 0 20 20">
+        <defs>
+          <linearGradient id="${gradId}">
+            <stop offset="${fillPercent}%" class="rw-star-partial-fill" />
+            <stop offset="${fillPercent}%" class="rw-star-partial-empty" />
+          </linearGradient>
+        </defs>
+        <path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z" fill="url(#${gradId})" />
+      </svg>`;
+  }
+  return html;
+}
+
+function updateSummaryAfterSubmit(newRating) {
+  // ─── Summary trong reviews-main ─────────────────────────────────
+  const summaryAvgEl = document.getElementById('rw-summary-avg');
+  if (summaryAvgEl) {
+    const sum = Number(summaryAvgEl.dataset.sum || 0) + newRating;
+    const count = Number(summaryAvgEl.dataset.count || 0) + 1;
+    const avg = sum / count;
+
+    summaryAvgEl.textContent = avg.toFixed(1);
+    summaryAvgEl.dataset.sum = sum;
+    summaryAvgEl.dataset.count = count;
+
+    const starsEl = document.getElementById('rw-summary-stars');
+    if (starsEl) starsEl.innerHTML = renderPartialStars(avg);
+
+    const countEl = document.getElementById('rw-summary-count');
+    if (countEl)
+      countEl.textContent = `${count} review${count !== 1 ? 's' : ''}`;
+  }
+
+  // ─── Badge (block riêng, có thể không tồn tại nếu merchant chưa đặt) ─
+  const badgeEl = document.getElementById('rw-badge');
+  if (badgeEl) {
+    const sum = Number(badgeEl.dataset.sum || 0) + newRating;
+    const count = Number(badgeEl.dataset.count || 0) + 1;
+    const avg = sum / count;
+
+    badgeEl.dataset.sum = sum;
+    badgeEl.dataset.count = count;
+
+    const starsEl = document.getElementById('rw-badge-stars');
+    if (starsEl) starsEl.innerHTML = renderPartialStars(avg, 'rw-star--sm');
+
+    const textEl = document.getElementById('rw-badge-text');
+    if (textEl) textEl.textContent = `${avg.toFixed(1)} (${count})`;
+  }
+}
+
+function insertOptimisticReview({ rating, author, title, body }) {
+  const list = document.getElementById('rw-list');
+  const emptyMsg = document.querySelector('.rw-empty');
+  if (!list) return;
+
+  const starsHtml = Array.from({ length: 5 }, (_, i) =>
+    starSVG(i < rating).replace('rw-star', 'rw-star rw-star--sm'),
+  ).join('');
+  const safeAuthor = escapeHtml(author || 'Anonymous');
+  const safeTitle = title ? escapeHtml(title) : '';
+  const safeBody = escapeHtml(body || '');
+
+  const item = document.createElement('div');
+  item.className = 'rw-item';
+  item.dataset.rating = rating;
+  item.dataset.hasImage = 0;
+  item.dataset.index = -1;
+
+  item.innerHTML = `
+    <div class="rw-item-top">
+      <div class="rw-avatar">${safeAuthor.charAt(0).toUpperCase()}</div>
+      <div>
+        <div class="rw-author-name">${safeAuthor} <span class="rw-verified">✓ Verified</span></div>
+        <div class="rw-item-date">${new Date().toLocaleDateString()}</div>
+      </div>
+    </div>
+    <span class="rw-stars" aria-hidden="true">${starsHtml}</span>
+    ${safeTitle ? `<p class="rw-item-title">${safeTitle}</p>` : ''}
+    <p class="rw-item-body">${safeBody}</p>
+  `;
+
+  // Nếu trước đó chưa có review nào (đang hiện "No reviews yet"), ẩn message đó
+  // và cần tạo #rw-list nếu nó chưa tồn tại trong DOM (trường hợp reviews.size == 0 lúc render).
+  if (emptyMsg) emptyMsg.style.display = 'none';
+
+  list.insertBefore(item, list.firstChild);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const main = document.getElementById('rw-main');
   if (!main) return;
@@ -414,12 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('');
   }
 
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
   function openLightbox(reviewIndex, imageIndex) {
     if (!reviewsData[reviewIndex]) return;
     lbReviewIndex = reviewIndex;
@@ -503,6 +605,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         overlay.classList.remove('rw-modal-overlay--open');
+
+        const submittedRating = Number(ratingInput.value);
+        insertOptimisticReview({
+          rating: submittedRating,
+          author: formData.get('author_name'),
+          title: formData.get('title'),
+          body: formData.get('body'),
+        });
+        updateSummaryAfterSubmit(submittedRating);
+
         form.reset();
         ratingContainer
           .querySelectorAll('.rw-star-pick')

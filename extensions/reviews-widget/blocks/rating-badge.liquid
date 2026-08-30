@@ -3,15 +3,37 @@
   {% assign reviews = product.metafields.custom.reviews.value %}
   {% if reviews.size > 0 %}
     {% assign total = 0 %}
-    {% for r in reviews %}{% assign total = total | plus: r.rating.value %}{% endfor %}
-    {% assign avg = total | divided_by: reviews.size | divided_by: 1.0 %}
-    <a href="#rw-main" class="rw-badge">
-      <span class="rw-stars" aria-hidden="true">
+    {% for r in reviews -%}
+      {%- assign total = total | plus: r.rating.value -%}
+    {%- endfor %}
+    {% assign avg = total | times: 1.0 | divided_by: reviews.size %}
+    <a href='#rw-main' class='rw-badge' id='rw-badge' data-sum='{{ total }}' data-count='{{ reviews.size }}'>
+      <span class='rw-stars' id='rw-badge-stars' aria-hidden='true'>
+        {% comment %} id để JS tìm và render lại khi có review mới {% endcomment %}
         {% for i in (1..5) %}
-          <svg class="rw-star rw-star--sm{% if i <= avg %} rw-star--filled{% endif %}" viewBox="0 0 20 20"><path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/></svg>
+          {% assign diff = avg | minus: i | plus: 1 %}
+          {% if diff >= 1 %}
+            {% assign fill_percent = 100 %}
+          {% elsif diff <= 0 %}
+            {% assign fill_percent = 0 %}
+          {% else %}
+            {% assign fill_percent = diff | times: 100 | round %}
+          {% endif %}
+          <svg class='rw-star rw-star--sm' viewBox='0 0 20 20'>
+            <defs>
+              <linearGradient id="rw-badge-star-grad-{{ product.id }}-{{ forloop.index }}">
+                <stop offset="{{ fill_percent }}%" class="rw-star-partial-fill" />
+                <stop offset="{{ fill_percent }}%" class="rw-star-partial-empty" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"
+              fill="url(#rw-badge-star-grad-{{ product.id }}-{{ forloop.index }})"
+            />
+          </svg>
         {% endfor %}
       </span>
-      <span class="rw-badge-text">{{ avg }} ({{ reviews.size }})</span>
+      <span class='rw-badge-text' id='rw-badge-text'>{{ avg | round: 1 }} ({{ reviews.size }})</span>
     </a>
   {% endif %}
 {% endif %}

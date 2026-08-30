@@ -13,18 +13,37 @@
             {% for r in reviews -%}
               {%- assign total = total | plus: r.rating.value -%}
             {%- endfor %}
-            {% assign avg = total | divided_by: reviews.size | divided_by: 1.0 %}
+            {% assign avg = total | times: 1.0 | divided_by: reviews.size %}
             <div class='rw-summary-rating'>
-              <div class='rw-avg'>{{ avg }}</div>
+              <div class='rw-avg' id='rw-summary-avg' data-sum='{{ total }}' data-count='{{ reviews.size }}'>
+                {{ avg | round: 1 }}
+              </div>
               <div>
                 <span class='rw-stars' aria-hidden='true'>
                   {% for i in (1..5) %}
-                    <svg class='rw-star{% if i <= avg %} rw-star--filled{% endif %}' viewBox='0 0 20 20'>
-                      <path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/>
+                    {% assign diff = avg | minus: i | plus: 1 %}
+                    {% if diff >= 1 %}
+                      {% assign fill_percent = 100 %}
+                    {% elsif diff <= 0 %}
+                      {% assign fill_percent = 0 %}
+                    {% else %}
+                      {% assign fill_percent = diff | times: 100 | round %}
+                    {% endif %}
+                    <svg class='rw-star' viewBox='0 0 20 20'>
+                      <defs>
+                        <linearGradient id='rw-star-grad-{{ product.id }}-{{ forloop.index }}'>
+                          <stop offset='{{ fill_percent }}%' class='rw-star-partial-fill' />
+                          <stop offset='{{ fill_percent }}%' class='rw-star-partial-empty' />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"
+                        fill='url(#rw-star-grad-{{ product.id }}-{{ forloop.index }})'
+                      />
                     </svg>
                   {% endfor %}
                 </span>
-                <div class='rw-count'>
+                <div class='rw-count' id='rw-summary-count'>
                   {{ reviews.size }} review{% if reviews.size != 1 %}s{% endif %}
                 </div>
               </div>
@@ -126,7 +145,7 @@
                 {% endif %}
               </div>
             </div>
-            <span class='rw-stars' aria-hidden='true'>
+            <span class='rw-stars' id='rw-summary-stars' aria-hidden='true'>
               {% for i in (1..5) %}
                 <svg
                   class='rw-star rw-star--sm{% if i <= review.rating.value %} rw-star--filled{% endif %}'
