@@ -144,6 +144,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const filterEmptyMsg = document.getElementById('rw-filter-empty');
 
+  // ─── Photo strip: prev/next slider ─────────────────────────────────
+  const photoStrip = document.getElementById('rw-photo-strip');
+  const photoPrevBtn = document.getElementById('rw-photo-prev');
+  const photoNextBtn = document.getElementById('rw-photo-next');
+
+  if (photoStrip && photoPrevBtn && photoNextBtn) {
+    function updatePhotoNavVisibility() {
+      const hasOverflow = photoStrip.scrollWidth > photoStrip.clientWidth + 1;
+      if (!hasOverflow) {
+        photoPrevBtn.hidden = true;
+        photoNextBtn.hidden = true;
+        return;
+      }
+      const atStart = photoStrip.scrollLeft <= 0;
+      const atEnd =
+        photoStrip.scrollLeft + photoStrip.clientWidth >=
+        photoStrip.scrollWidth - 1;
+      photoPrevBtn.hidden = atStart;
+      photoNextBtn.hidden = atEnd;
+    }
+
+    function scrollPhotoStrip(direction) {
+      const scrollAmount = photoStrip.clientWidth * 0.8;
+      photoStrip.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+
+    photoPrevBtn.addEventListener('click', () => scrollPhotoStrip(-1));
+    photoNextBtn.addEventListener('click', () => scrollPhotoStrip(1));
+    photoStrip.addEventListener('scroll', updatePhotoNavVisibility);
+    window.addEventListener('resize', updatePhotoNavVisibility);
+
+    // Chạy lần đầu sau khi ảnh load xong (kích thước strip có thể đổi khi
+    // ảnh lazy-load xong, nên chạy lại 1 lần nữa sau khi trang ổn định).
+    updatePhotoNavVisibility();
+    window.addEventListener('load', updatePhotoNavVisibility);
+  }
+
   function applyFilters() {
     let visibleCount = 0;
     let shownSoFar = 0;

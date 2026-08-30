@@ -40,6 +40,7 @@
   box-sizing: border-box;
   margin: 32px auto;
   color: var(--rw-color-text);
+  overflow-x: hidden;
 }
 
 /* Ép wrapper mà Shopify tự thêm quanh app block / section phải giãn hết cỡ,
@@ -159,6 +160,8 @@
 /* ─── Photo strip tổng hợp ─── */
 .rw-photo-section {
   margin-bottom: 24px;
+  overflow: hidden;
+  padding: 0 4px;
 }
 .rw-photo-section-title {
   font-size: var(--rw-font-size-sm);
@@ -173,19 +176,71 @@
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 4px;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
 }
+
 .rw-photo-strip-img {
   width: 84px;
   height: 84px;
+  min-width: 84px;
+  min-height: 84px;
+  max-width: 84px;
+  max-height: 84px;
   object-fit: cover;
   border-radius: var(--rw-radius-sm);
   flex-shrink: 0;
   cursor: pointer;
   border: 1px solid var(--rw-color-border);
+  display: block;
   transition: transform 0.15s ease;
 }
 .rw-photo-strip-img:hover {
   transform: scale(1.04);
+}
+.rw-photo-strip-wrap {
+  position: relative;
+}
+.rw-photo-strip::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.rw-photo-nav {
+  position: absolute;
+  top: 42px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--rw-color-border-input);
+  background: var(--rw-color-bg);
+  color: var(--rw-color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+  transition:
+    opacity 0.15s ease,
+    border-color 0.15s ease;
+}
+.rw-photo-nav:hover {
+  border-color: var(--rw-color-primary);
+  color: var(--rw-color-primary);
+}
+.rw-photo-nav[hidden] {
+  display: none;
+}
+.rw-photo-nav svg {
+  width: 16px;
+  height: 16px;
+}
+.rw-photo-nav--prev {
+  left: 4px;
+}
+.rw-photo-nav--next {
+  right: 4px;
 }
 
 /* ─── Filters / Sort ─── */
@@ -373,10 +428,15 @@
 .rw-item-image {
   width: 64px;
   height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+  max-width: 64px;
+  max-height: 64px;
   object-fit: cover;
   border-radius: var(--rw-radius-sm);
   border: 1px solid var(--rw-color-border);
   cursor: pointer;
+  display: block;
   transition: transform 0.15s ease;
 }
 .rw-item-image:hover {
@@ -905,11 +965,16 @@
     height: 90vh;
   }
   .rw-lightbox-media {
-    flex: 1 1 55%;
+    flex: 0 0 42vh;
+    max-height: 42vh;
+  }
+  #rw-lightbox-img {
+    max-height: 100%;
   }
   .rw-lightbox-panel {
     flex: 1 1 auto;
-    border-top: 1px solid var(--rw-color-border);
+    min-height: 0;
+    overflow-y: auto;
   }
 }
 
@@ -923,5 +988,24 @@
   }
   .rw-modal {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .rw-item-image {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    max-width: 56px;
+    max-height: 56px;
+  }
+  .rw-photo-strip-img {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    min-height: 72px;
+    max-width: 72px;
+    max-height: 72px;
   }
 }

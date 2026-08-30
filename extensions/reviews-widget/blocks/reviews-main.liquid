@@ -87,26 +87,64 @@
     {% if total_images > 0 %}
       <div class='rw-photo-section'>
         <p class='rw-photo-section-title'>Photos from reviews</p>
-        <div class='rw-photo-strip' id='rw-photo-strip'>
-          {% assign shown = 0 %}
-          {% for review in reviews %}
-            {% assign imgs = review.images.value %}
-            {% for img in imgs %}
-              {% if shown < 10 %}
-                <img
-                  src='{{ img | image_url: width: 200 }}'
-                  alt=''
-                  class='rw-photo-strip-img rw-lightbox-trigger'
-                  data-review-index='{{ forloop.parentloop.index0 }}'
-                  data-image-index='{{ forloop.index0 }}'
-                  loading='lazy'
-                  width='84'
-                  height='84'
-                >
-                {% assign shown = shown | plus: 1 %}
-              {% endif %}
+        <div class='rw-photo-strip-wrap' id='rw-photo-strip-wrap'>
+          <button
+            type='button'
+            class='rw-photo-nav rw-photo-nav--prev'
+            id='rw-photo-prev'
+            aria-label='Previous photos'
+            hidden
+          >
+            <svg
+              viewBox='0 0 20 20'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+              stroke-linecap='round'
+              stroke-linejoin='round'
+            >
+              <path d='M12 4l-6 6 6 6'/>
+            </svg>
+          </button>
+          <div class='rw-photo-strip' id='rw-photo-strip'>
+            {% assign shown = 0 %}
+            {% for review in reviews %}
+              {% assign imgs = review.images.value %}
+              {% for img in imgs %}
+                {% if shown < 10 %}
+                  <img
+                    src='{{ img | image_url: width: 200 }}'
+                    alt=''
+                    class='rw-photo-strip-img rw-lightbox-trigger'
+                    data-review-index='{{ forloop.parentloop.index0 }}'
+                    data-image-index='{{ forloop.index0 }}'
+                    loading='lazy'
+                    width='84'
+                    height='84'
+                  >
+                  {% assign shown = shown | plus: 1 %}
+                {% endif %}
+              {% endfor %}
             {% endfor %}
-          {% endfor %}
+          </div>
+          <button
+            type='button'
+            class='rw-photo-nav rw-photo-nav--next'
+            id='rw-photo-next'
+            aria-label='Next photos'
+            hidden
+          >
+            <svg
+              viewBox='0 0 20 20'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+              stroke-linecap='round'
+              stroke-linejoin='round'
+            >
+              <path d='M8 4l6 6-6 6'/>
+            </svg>
+          </button>
         </div>
       </div>
     {% endif %}
