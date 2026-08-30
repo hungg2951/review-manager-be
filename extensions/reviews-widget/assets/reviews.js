@@ -132,6 +132,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const list = document.getElementById('rw-list');
   const items = list ? Array.from(list.querySelectorAll('.rw-item')) : [];
 
+  // ─── Load more — hiện dần từng đợt, tích hợp với filter hiện có ────
+  const PAGE_SIZE = 5;
+  let visibleLimit = PAGE_SIZE;
+  const loadMoreBtn = document.getElementById('rw-load-more-btn');
+  const loadMoreWrap = document.getElementById('rw-load-more-wrap');
+
   // ─── Filter ─────────────────────────────────────────────────────
   const activeRatings = new Set();
   let onlyWithImages = false;
@@ -140,18 +146,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyFilters() {
     let visibleCount = 0;
+    let shownSoFar = 0;
     items.forEach((item) => {
       const rating = Number(item.dataset.rating);
       const hasImage = Number(item.dataset.hasImage) > 0;
       const matchRating = activeRatings.size === 0 || activeRatings.has(rating);
       const matchImage = !onlyWithImages || hasImage;
-      const visible = matchRating && matchImage;
+      const matchesFilter = matchRating && matchImage;
+      let visible = false;
+      if (matchesFilter) {
+        shownSoFar++;
+        visible = shownSoFar <= visibleLimit;
+      }
+
       item.style.display = visible ? '' : 'none';
       if (visible) visibleCount++;
     });
 
     if (filterEmptyMsg) {
       filterEmptyMsg.hidden = visibleCount !== 0;
+    }
+
+    // Hiện/ẩn nút "Show more" tuỳ còn item nào bị giới hạn ẩn không
+    if (loadMoreWrap) {
+      const totalMatching = items.filter((item) => {
+        const rating = Number(item.dataset.rating);
+        const hasImage = Number(item.dataset.hasImage) > 0;
+        const matchRating =
+          activeRatings.size === 0 || activeRatings.has(rating);
+        const matchImage = !onlyWithImages || hasImage;
+        return matchRating && matchImage;
+      }).length;
+      loadMoreWrap.hidden = totalMatching <= visibleLimit;
     }
   }
 
@@ -165,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeRatings.add(val);
         btn.classList.add('rw-filter-tag--active');
       }
+      visibleLimit = PAGE_SIZE;
       applyFilters();
     });
   });
@@ -174,9 +201,20 @@ document.addEventListener('DOMContentLoaded', () => {
     imgFilterBtn.addEventListener('click', () => {
       onlyWithImages = !onlyWithImages;
       imgFilterBtn.classList.toggle('rw-filter-tag--active', onlyWithImages);
+      visibleLimit = PAGE_SIZE;
       applyFilters();
     });
   }
+
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      visibleLimit += PAGE_SIZE;
+      applyFilters();
+    });
+  }
+
+  // Chạy lần đầu để áp giới hạn ngay khi tải trang (kể cả khi chưa filter gì)
+  applyFilters();
 
   // ─── Sort: icon button + dropdown thay cho <select> ────────────────
   const sortBtn = document.getElementById('rw-sort-btn');
@@ -193,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return Number(a.dataset.index) - Number(b.dataset.index);
     });
     sorted.forEach((el) => list.appendChild(el));
+    applyFilters();
   }
 
   if (sortBtn && sortMenu) {
@@ -630,6 +669,9 @@ document.addEventListener('DOMContentLoaded', () => {
           images: previewImageUrls,
         });
         updateSummaryAfterSubmit(submittedRating);
+        items.unshift(list.firstChild); // thêm phần tử vừa chèn vào đầu mảng items để filter/loadmore nhận diện được
+        visibleLimit++; // đảm bảo review mới luôn hiện ngay, không bị đếm vào phần ẩn
+        applyFilters();
 
         form.reset();
         ratingContainer

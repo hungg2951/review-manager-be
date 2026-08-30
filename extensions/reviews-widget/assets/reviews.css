@@ -389,6 +389,13 @@
   padding: 32px 0;
   text-align: center;
 }
+.rw-load-more-wrap {
+  margin-top: 16px;
+  text-align: center;
+}
+.rw-load-more-wrap[hidden] {
+  display: none;
+}
 
 /* ─── Modal viết review ─── */
 .rw-modal-overlay {
