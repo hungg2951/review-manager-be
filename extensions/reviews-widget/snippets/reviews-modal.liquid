@@ -1,0 +1,116 @@
+<div class='rw-modal-overlay' id='rw-modal-overlay'>
+  <div class='rw-modal' role='dialog' aria-modal='true' aria-labelledby='rw-modal-title'>
+    <button type='button' class='rw-modal-close' id='rw-modal-close' aria-label='Close'>&times;</button>
+
+    <form id='rw-form' class='rw-form' novalidate>
+      <!-- Step 1: Rating -->
+      <div class='rw-step rw-step--centered' data-step='1'>
+        <h3 class='rw-step-title' id='rw-modal-title'>How would you rate this product?</h3>
+        <p class='rw-step-subtitle'>We would love it if you would share a bit about your experience.</p>
+
+        {% if product.featured_image %}
+          <img
+            class='rw-product-thumb'
+            src='{{ product.featured_image | image_url: width: 200 }}'
+            alt='{{ product.title | escape }}'
+          >
+        {% endif %}
+        <p class='rw-product-name'>{{ product.title }}</p>
+
+        <div class='rw-rating-input rw-rating-input--lg' id='rw-rating-input'>
+          {% for i in (1..5) %}
+            <svg class='rw-star rw-star-pick' data-value='{{ i }}' viewBox='0 0 20 20'>
+              <path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/>
+            </svg>
+          {% endfor %}
+        </div>
+        <input type='hidden' name='rating' id='rw-rating-value' required>
+      </div>
+
+      <!-- Step 2: Review content -->
+      <div class='rw-step' data-step='2' hidden>
+        <div class='rw-step-recap'>
+          {% if product.featured_image %}
+            <img
+              class='rw-product-thumb rw-product-thumb--sm'
+              src='{{ product.featured_image | image_url: width: 80 }}'
+              alt='{{ product.title | escape }}'
+            >
+          {% endif %}
+          <div>
+            <p class='rw-product-name rw-product-name--sm'>{{ product.title }}</p>
+            <span class='rw-stars' id='rw-recap-stars' aria-hidden='true'></span>
+          </div>
+        </div>
+        <div class='rw-field'>
+          <label for='rw-input-title'>Review title</label>
+          <input type='text' id='rw-input-title' name='title' placeholder='Give your review a title'>
+        </div>
+        <div class='rw-field'>
+          <label for='rw-input-body'>Review content <span class='rw-required'>(Required)</span></label>
+          <textarea id='rw-input-body' name='body' rows='6' required></textarea>
+        </div>
+        <p class='rw-form-note'>
+          We'll only contact you about your review if necessary. By submitting your review, you agree to our
+          <a href='/pages/terms-and-conditions' target='_blank' rel='noopener'>terms and conditions</a> and
+          <a href='/policies/privacy-policy' target='_blank' rel='noopener'>privacy policy</a>.
+        </p>
+      </div>
+
+      <!-- Step 3: About you -->
+      <div class='rw-step rw-step--centered' data-step='3' hidden>
+        <h3 class='rw-step-title'>About you</h3>
+        <p class='rw-step-subtitle'>Please tell us more about you.</p>
+
+        <div class='rw-field rw-field--left'>
+          <label for='rw-input-email'>Email address <span class='rw-required'>(Required)</span></label>
+          <input type='email' id='rw-input-email' name='author_email' placeholder='Your email address' required>
+          <span class='rw-field-hint'>We respect your privacy.</span>
+        </div>
+        <div class='rw-field rw-field--left'>
+          <label for='rw-input-name'>Display name <span class='rw-required'>(Required)</span></label>
+          <input type='text' id='rw-input-name' name='author_name' placeholder='Display name' required>
+        </div>
+        {% comment %}
+          <label class="rw-checkbox">
+            <input type="checkbox" id="rw-input-anonymous" name="anonymous" value="1">
+            <span>Post review as anonymous</span>
+          </label>
+        {% endcomment %}
+      </div>
+
+      <!-- Step 4: Photos -->
+      <div class='rw-step rw-step--centered' data-step='4' hidden>
+        <h3 class='rw-step-title'>Share a picture or video</h3>
+        <p class='rw-step-subtitle'>Upload a photo or video to support your review.</p>
+
+        <label class='rw-upload-dropzone' id='rw-upload-dropzone' for='rw-input-images'>
+          <svg
+            class='rw-upload-icon'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            stroke-width='2'
+            stroke-linecap='round'
+            stroke-linejoin='round'
+          >
+            <path d="M12 16V4"/>
+            <path d="M7 8l5-5 5 5"/>
+            <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+          </svg>
+          <span><strong>Click to upload</strong> or drag and drop</span>
+          <input type='file' id='rw-input-images' name='images' accept='image/*' multiple hidden>
+        </label>
+        <p class='rw-upload-filenames' id='rw-upload-filenames'></p>
+      </div>
+
+      <div class='rw-form-error' id='rw-form-error' hidden></div>
+
+      <div class='rw-step-nav'>
+        <button type='button' class='rw-btn-secondary' id='rw-step-back' hidden>&larr; Back</button>
+        <button type='button' class='rw-btn-primary' id='rw-step-next'>Next</button>
+        <button type='submit' class='rw-btn-primary' id='rw-submit-btn' hidden>Submit review</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -131,4 +131,29 @@ export class ShopifyOAuthService {
   async deactivateShop(shop: string): Promise<void> {
     await this.shopService.deactivateByShopifyDomain(shop);
   }
+
+  /**
+   * Verify chữ ký App Proxy — KHÁC cơ chế verifyQueryHmac (OAuth):
+   * không dùng dấu '&' nối, không có tham số 'hmac' mà là 'signature'.
+   * Thuật toán: sort key, nối "key=value" liền nhau không dấu phân cách.
+   */
+  verifyAppProxySignature(query: Record<string, string>): boolean {
+    const { signature, ...rest } = query;
+    if (!signature) return false;
+
+    const message = Object.keys(rest)
+      .sort()
+      .map((key) => `${key}=${rest[key]}`)
+      .join('');
+
+    const generatedHash = crypto
+      .createHmac('sha256', this.apiSecret)
+      .update(message)
+      .digest('hex');
+
+    const a = Buffer.from(generatedHash, 'utf8');
+    const b = Buffer.from(signature, 'utf8');
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  }
 }

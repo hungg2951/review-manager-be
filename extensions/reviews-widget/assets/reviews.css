@@ -1,0 +1,846 @@
+/* ─── Design tokens — đổi màu ở đây, áp dụng toàn bộ review widget ─── */
+:root {
+  --rw-color-primary: #059669;
+  --rw-color-primary-hover: #047857;
+  --rw-color-star: #f5a623;
+  --rw-color-star-empty: #d1d5db;
+  --rw-color-text: #111827;
+  --rw-color-text-muted: #6b7280;
+  --rw-color-border: #e5e7eb;
+  --rw-color-border-input: #d1d5db;
+  --rw-color-bg: #ffffff;
+  --rw-color-bg-muted: #f9fafb;
+  --rw-color-error: #dc2626;
+  --rw-color-verified: #059669;
+  --rw-radius: 8px;
+  --rw-radius-sm: 6px;
+  --rw-font-size-sm: 0.85rem;
+  --rw-font-size-xs: 0.78rem;
+}
+
+/* ─── Badge (dưới tên sản phẩm) ─── */
+.rw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  margin: 8px 0;
+  cursor: pointer;
+}
+.rw-badge-text {
+  font-size: var(--rw-font-size-sm);
+  color: var(--rw-color-text-muted);
+}
+
+/* ─── Container chính — full width theo khối cha ─── */
+.rw-main {
+  width: 100%;
+  max-width: 1200PX;
+  box-sizing: border-box;
+  margin: 32px auto;
+  color: var(--rw-color-text);
+}
+
+/* Ép wrapper mà Shopify tự thêm quanh app block / section phải giãn hết cỡ,
+   để .rw-main width:100% có cái gì đó full thật sự để bám vào.
+   Không phá gì nếu wrapper đó không tồn tại. */
+.shopify-app-block:has(#rw-main),
+.shopify-section:has(#rw-main) {
+  display: block;
+  width: 100%;
+}
+
+.rw-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.rw-summary-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rw-avg {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rw-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.rw-count {
+  font-size: var(--rw-font-size-sm);
+  color: var(--rw-color-text-muted);
+  margin-top: 4px;
+}
+
+.rw-stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.rw-star {
+  width: 20px;
+  height: 20px;
+  fill: var(--rw-color-star-empty);
+  flex-shrink: 0;
+}
+.rw-star--sm {
+  width: 16px;
+  height: 16px;
+}
+.rw-star--filled {
+  fill: var(--rw-color-star);
+}
+
+/* ─── Buttons ─── */
+.rw-btn-primary {
+  background: var(--rw-color-primary);
+  color: #fff;
+  border: none;
+  padding: 11px 20px;
+  border-radius: var(--rw-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.rw-btn-primary:hover {
+  background: var(--rw-color-primary-hover);
+}
+.rw-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.rw-btn-block {
+  width: 100%;
+}
+.rw-btn-secondary {
+  background: var(--rw-color-bg);
+  color: var(--rw-color-text);
+  border: 1px solid var(--rw-color-border-input);
+  padding: 11px 20px;
+  border-radius: var(--rw-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.rw-btn-secondary:hover {
+  border-color: var(--rw-color-primary);
+  color: var(--rw-color-primary);
+}
+
+/* ─── Photo strip tổng hợp ─── */
+.rw-photo-section {
+  margin-bottom: 24px;
+}
+.rw-photo-section-title {
+  font-size: var(--rw-font-size-sm);
+  font-weight: 600;
+  color: var(--rw-color-text-muted);
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.rw-photo-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.rw-photo-strip-img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: var(--rw-radius-sm);
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid var(--rw-color-border);
+  transition: transform 0.15s ease;
+}
+.rw-photo-strip-img:hover {
+  transform: scale(1.04);
+}
+
+/* ─── Filters / Sort ─── */
+.rw-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rw-color-border);
+}
+/* ─── Actions: nút Write a review + icon sort cạnh nhau ─── */
+.rw-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rw-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border: 1px solid var(--rw-color-border-input);
+  border-radius: var(--rw-radius-sm);
+  background: var(--rw-color-bg);
+  color: var(--rw-color-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.rw-icon-btn:hover {
+  border-color: var(--rw-color-primary);
+  color: var(--rw-color-primary);
+}
+.rw-icon-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-sort-wrapper {
+  position: relative;
+}
+
+.rw-sort-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--rw-color-bg);
+  border: 1px solid var(--rw-color-border);
+  border-radius: var(--rw-radius-sm);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 20;
+}
+.rw-sort-menu[hidden] {
+  display: none;
+}
+
+.rw-sort-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--rw-color-text);
+}
+.rw-sort-menu-item:hover {
+  background: var(--rw-color-bg-muted);
+}
+.rw-sort-menu-item--active,
+.rw-sort-menu-item--active:hover {
+  background: #2563eb;
+  color: #fff;
+}
+.rw-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.rw-filters-label {
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-text-muted);
+  margin-right: 4px;
+}
+.rw-filter-tag {
+  border: 1px solid var(--rw-color-border-input);
+  background: var(--rw-color-bg);
+  color: var(--rw-color-text);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: var(--rw-font-size-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.rw-filter-tag:hover {
+  border-color: var(--rw-color-primary);
+}
+.rw-filter-tag--active {
+  background: var(--rw-color-primary);
+  border-color: var(--rw-color-primary);
+  color: #fff;
+}
+.rw-filter-empty {
+  color: var(--rw-color-text-muted);
+  font-size: 0.9rem;
+  padding: 32px 0;
+  text-align: center;
+}
+/* ─── Review list ─── */
+.rw-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.rw-item {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--rw-color-border);
+}
+.rw-item-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.rw-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--rw-color-bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--rw-color-text);
+  flex-shrink: 0;
+}
+.rw-author-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.rw-verified {
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-verified);
+  font-weight: 500;
+}
+.rw-item-title {
+  font-weight: 600;
+  margin: 8px 0 4px 0;
+  font-size: 0.95rem;
+}
+.rw-item-body {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--rw-color-text);
+  margin: 4px 0 10px 0;
+  white-space: pre-wrap;
+}
+.rw-item-images {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rw-item-image {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--rw-radius-sm);
+  border: 1px solid var(--rw-color-border);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.rw-item-image:hover {
+  transform: scale(1.04);
+}
+
+.rw-empty {
+  color: var(--rw-color-text-muted);
+  font-size: 0.9rem;
+  padding: 32px 0;
+  text-align: center;
+}
+
+/* ─── Modal viết review ─── */
+.rw-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2147483000;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+}
+.rw-modal-overlay--open {
+  display: flex;
+}
+
+.rw-modal {
+  background: var(--rw-color-bg);
+  border-radius: var(--rw-radius);
+  padding: 40px 24px 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2147483001;
+  margin: auto;
+}
+
+.rw-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--rw-color-text);
+  padding: 4px 8px;
+  z-index: 1;
+}
+.rw-modal-close:hover {
+  color: var(--rw-color-primary);
+}
+
+.rw-step-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.rw-step-nav > button {
+  flex: 1;
+}
+
+.rw-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rw-step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rw-step[hidden] {
+  display: none;
+}
+.rw-step--centered {
+  align-items: center;
+  text-align: center;
+}
+.rw-step-title {
+  margin: 8px 0 0 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.rw-step-subtitle {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--rw-color-text-muted);
+  max-width: 340px;
+}
+
+/* ─── Ảnh + tên sản phẩm ─── */
+.rw-product-thumb {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: var(--rw-radius);
+  margin-top: 8px;
+}
+.rw-product-thumb--sm {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rw-radius-sm);
+  margin-top: 0;
+  flex-shrink: 0;
+}
+.rw-product-name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.rw-product-name--sm {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+/* ─── Recap header ở bước "Review content" ─── */
+.rw-step-recap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rw-color-border);
+}
+
+/* ─── Rating cỡ lớn (bước 1) + nhãn Poor/Great ─── */
+.rw-rating-input--lg {
+  gap: 12px;
+  margin-top: 4px;
+}
+.rw-rating-input--lg .rw-star-pick {
+  width: 42px;
+  height: 42px;
+}
+.rw-rating-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 260px;
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-text-muted);
+  font-weight: 600;
+  margin-top: -8px;
+}
+
+.rw-form-note {
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+.rw-form-note a {
+  color: var(--rw-color-text);
+  text-decoration: underline;
+}
+
+.rw-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rw-field--left {
+  width: 100%;
+  text-align: left;
+}
+.rw-field label {
+  font-size: var(--rw-font-size-sm);
+  font-weight: 600;
+  color: var(--rw-color-text);
+}
+.rw-field-hint {
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-text-muted);
+}
+
+/* ─── Checkbox "Post review as anonymous" ─── */
+.rw-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--rw-font-size-sm);
+  color: var(--rw-color-text);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.rw-checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--rw-color-primary);
+  cursor: pointer;
+}
+
+/* ─── Dropzone upload ảnh (bước 4) ─── */
+.rw-upload-dropzone {
+  width: 100%;
+  min-height: 140px;
+  border: 1.5px dashed var(--rw-color-border-input);
+  border-radius: var(--rw-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--rw-color-text-muted);
+  font-size: 0.9rem;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.rw-upload-dropzone:hover,
+.rw-upload-dropzone--dragover {
+  border-color: var(--rw-color-primary);
+  background: var(--rw-color-bg-muted);
+}
+.rw-upload-dropzone strong {
+  color: var(--rw-color-text);
+}
+.rw-upload-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--rw-color-text-muted);
+}
+.rw-upload-filenames {
+  margin: 0;
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-text-muted);
+  word-break: break-word;
+}
+.rw-field input[type='text'],
+.rw-field input[type='email'],
+.rw-field textarea {
+  border: 1px solid var(--rw-color-border-input);
+  border-radius: var(--rw-radius-sm);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--rw-color-text);
+  background: var(--rw-color-bg);
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color 0.15s ease;
+}
+.rw-field input[type='text']:focus,
+.rw-field input[type='email']:focus,
+.rw-field textarea:focus {
+  outline: none;
+  border-color: var(--rw-color-primary);
+}
+.rw-field textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+.rw-field input[type='file'] {
+  font-size: var(--rw-font-size-xs);
+  color: var(--rw-color-text-muted);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rw-rating-input {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+.rw-star-pick {
+  width: 30px;
+  height: 30px;
+  fill: var(--rw-color-star-empty);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    fill 0.1s ease,
+    transform 0.1s ease;
+}
+.rw-star-pick:hover {
+  transform: scale(1.12);
+}
+/* Fix: trước đây .rw-star-pick (khai báo sau trong file) luôn đè màu rỗng lên
+   .rw-star--filled (khai báo trước) vì cùng độ đặc thù CSS. Gộp 2 class lại
+   để selector này đặc thù hơn, luôn thắng bất kể thứ tự khai báo. */
+.rw-star-pick.rw-star--filled {
+  fill: var(--rw-color-star);
+}
+
+.rw-form-error {
+  color: var(--rw-color-error);
+  font-size: var(--rw-font-size-sm);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--rw-radius-sm);
+  padding: 8px 12px;
+}
+.rw-required {
+  color: var(--rw-color-error);
+}
+
+/* ─── Lightbox: layout dạng split — ảnh lớn bên trái, panel review bên phải ─── */
+.rw-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 2147483002;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.rw-lightbox--open {
+  display: flex;
+}
+
+.rw-lightbox-inner {
+  display: flex;
+  width: min(1100px, 94vw);
+  height: min(680px, 88vh);
+  background: var(--rw-color-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.rw-lightbox-media {
+  position: relative;
+  flex: 1 1 62%;
+  background: #0b0b0c;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#rw-lightbox-img {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  object-fit: contain;
+  background: #0b0b0c;
+  border-radius: 0;
+}
+
+.rw-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.15s ease;
+}
+.rw-lightbox-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+.rw-lightbox-prev {
+  left: 16px;
+}
+.rw-lightbox-next {
+  right: 16px;
+}
+.rw-lightbox-nav[hidden] {
+  display: none;
+}
+
+.rw-lightbox-thumbs {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #000;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.rw-lightbox-thumbs[hidden] {
+  display: none;
+}
+.rw-lightbox-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.55;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+  transition:
+    opacity 0.15s ease,
+    border-color 0.15s ease;
+}
+.rw-lightbox-thumb:hover {
+  opacity: 0.85;
+}
+.rw-lightbox-thumb--active {
+  opacity: 1;
+  border-color: var(--rw-color-primary);
+}
+
+.rw-lightbox-panel {
+  flex: 0 0 320px;
+  background: var(--rw-color-bg);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.rw-lightbox-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rw-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 3;
+}
+
+@media (min-width: 641px) {
+  .rw-modal {
+    min-width: 600px;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+  }
+  .rw-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .rw-step:not([hidden]) {
+    flex: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .rw-lightbox-inner {
+    flex-direction: column;
+    width: 94vw;
+    height: 90vh;
+  }
+  .rw-lightbox-media {
+    flex: 1 1 55%;
+  }
+  .rw-lightbox-panel {
+    flex: 1 1 auto;
+    border-top: 1px solid var(--rw-color-border);
+  }
+}
+
+@media (max-width: 640px) {
+  .rw-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .rw-btn-primary {
+    width: 100%;
+  }
+  .rw-modal {
+    max-width: 100%;
+  }
+}

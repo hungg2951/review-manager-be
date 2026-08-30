@@ -1,0 +1,234 @@
+{% if product %}
+  {{ 'reviews.css' | asset_url | stylesheet_tag }}
+  {% assign reviews_asc = product.metafields.custom.reviews.value %}
+  {% assign reviews = reviews_asc | reverse %}
+
+  <div class='rw-main' id='rw-main' data-shop='{{ shop.permanent_domain }}' data-product-id='{{ product.id }}'>
+    <div class='rw-top'>
+      <div class='rw-summary-block'>
+        {% if reviews.size > 0 %}
+          {% assign total = 0 %}
+          {% for r in reviews -%}
+            {%- assign total = total | plus: r.rating.value -%}
+          {%- endfor %}
+          {% assign avg = total | divided_by: reviews.size | divided_by: 1.0 %}
+          <div class='rw-avg'>{{ avg }}</div>
+          <div>
+            <span class='rw-stars' aria-hidden='true'>
+              {% for i in (1..5) %}
+                <svg class='rw-star{% if i <= avg %} rw-star--filled{% endif %}' viewBox='0 0 20 20'>
+                  <path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/>
+                </svg>
+              {% endfor %}
+            </span>
+            <div class='rw-count'>
+              {{ reviews.size }} review{% if reviews.size != 1 %}s{% endif %}
+            </div>
+          </div>
+        {% else %}
+          <h3 class='rw-title'>{{ block.settings.heading | default: 'Customer Reviews' }}</h3>
+        {% endif %}
+      </div>
+      <div class='rw-actions'>
+        <button type='button' class='rw-btn-primary' id='rw-open-modal'>Write a review</button>
+        <div class='rw-sort-wrapper'>
+          <button
+            type='button'
+            class='rw-icon-btn'
+            id='rw-sort-btn'
+            aria-haspopup='true'
+            aria-expanded='false'
+            aria-label='Sort reviews'
+          >
+            <svg viewBox='0 0 20 20'>
+              <path d='M6 3v12M6 3 3 6M6 3l3 3M14 17V5M14 17l-3-3M14 17l3-3'/>
+            </svg>
+          </button>
+          <div class='rw-sort-menu' id='rw-sort-menu' hidden>
+            <button type='button' class='rw-sort-menu-item rw-sort-menu-item--active' data-sort-value='recent'>
+              Most recent
+            </button>
+            <button type='button' class='rw-sort-menu-item' data-sort-value='highest'>Highest rating</button>
+            <button type='button' class='rw-sort-menu-item' data-sort-value='lowest'>Lowest rating</button>
+            <button type='button' class='rw-sort-menu-item' data-sort-value='pictures'>Pictures first</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Đếm tổng số ảnh để biết có cần hiện dải ảnh hay không {% endcomment %}
+    {% assign total_images = 0 %}
+    {% for r in reviews %}
+      {% assign total_images = total_images | plus: r.images.value.size %}
+    {% endfor %}
+
+    {% if total_images > 0 %}
+      <div class='rw-photo-section'>
+        <p class='rw-photo-section-title'>Photos from reviews</p>
+        <div class='rw-photo-strip' id='rw-photo-strip'>
+          {% assign shown = 0 %}
+          {% for review in reviews %}
+            {% assign imgs = review.images.value %}
+            {% for img in imgs %}
+              {% if shown < 10 %}
+                <img
+                  src='{{ img | image_url: width: 200 }}'
+                  alt=''
+                  class='rw-photo-strip-img rw-lightbox-trigger'
+                  data-review-index='{{ forloop.parentloop.index0 }}'
+                  data-image-index='{{ forloop.index0 }}'
+                  loading='lazy'
+                  width='84'
+                  height='84'
+                >
+                {% assign shown = shown | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if reviews.size > 0 %}
+      <div class='rw-controls'>
+        <div class='rw-filters'>
+          <span class='rw-filters-label'>Rating:</span>
+          {% for i in (1..5) %}
+            <button type='button' class='rw-filter-tag' data-filter-rating='{{ i }}'>{{ i }} ★</button>
+          {% endfor %}
+          <button type='button' class='rw-filter-tag' data-filter-images='1'>Only pictures</button>
+        </div>
+      </div>
+
+      <div class='rw-list' id='rw-list'>
+        {% for review in reviews %}
+          {% assign imgs = review.images.value %}
+          <div
+            class='rw-item'
+            data-rating='{{ review.rating.value }}'
+            data-has-image='{{ imgs.size }}'
+            data-index='{{ forloop.index0 }}'
+          >
+            <div class='rw-item-top'>
+              <div class='rw-avatar'>{{ review.author_name.value | default: 'A' | slice: 0, 1 | upcase }}</div>
+              <div>
+                <div class='rw-author-name'>{{ review.author_name.value | default: 'Anonymous' }}</div>
+              </div>
+            </div>
+            <span class='rw-stars' aria-hidden='true'>
+              {% for i in (1..5) %}
+                <svg
+                  class='rw-star rw-star--sm{% if i <= review.rating.value %} rw-star--filled{% endif %}'
+                  viewBox='0 0 20 20'
+                >
+                  <path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/>
+                </svg>
+              {% endfor %}
+            </span>
+            {% if review.title.value != blank %}
+              <p class='rw-item-title'>{{ review.title.value }}</p>
+            {% endif %}
+            <p class='rw-item-body'>{{ review.body.value }}</p>
+            {% if imgs.size > 0 %}
+              <div class='rw-item-images'>
+                {% for img in imgs %}
+                  <img
+                    src='{{ img | image_url: width: 120 }}'
+                    alt=''
+                    class='rw-item-image rw-lightbox-trigger'
+                    data-review-index='{{ forloop.parentloop.index0 }}'
+                    data-image-index='{{ forloop.index0 }}'
+                    loading='lazy'
+                    width='60'
+                    height='60'
+                  >
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <p class='rw-filter-empty' id='rw-filter-empty' hidden>No reviews match the selected filters.</p>
+    {% else %}
+      <p class='rw-empty'>
+        {{ block.settings.empty_text | default: 'No reviews yet. Be the first to review this product!' }}
+      </p>
+    {% endif %}
+  </div>
+
+  {% comment %}
+    Dữ liệu review dạng JSON để lightbox đọc và hiện panel bên phải (sao, tên, ngày, nội dung).
+    LƯU Ý: "date" đang giả định field là review.created_at.value — đổi lại đúng tên field
+    ngày tháng thật của bạn, hoặc xoá dòng "date" nếu review không lưu ngày.
+  {% endcomment %}
+  <script type='application/json' id='rw-reviews-data'>
+    [
+      {% for review in reviews %}
+        {
+          "rating": {{ review.rating.value | default: 0 | json }},
+          "author": {{ review.author_name.value | default: 'Anonymous' | json }},
+          "date": {{ review.created_at.value | default: '' | json }},
+          "body": {{ review.body.value | default: '' | json }},
+          "images": [
+            {% assign imgs = review.images.value %}
+            {% for img in imgs %}
+              { "thumb": {{ img | image_url: width: 160 | json }}, "full": {{ img | image_url: width: 1600 | json }} }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  </script>
+
+  <div class='rw-lightbox' id='rw-lightbox'>
+    <button type='button' class='rw-lightbox-close' id='rw-lightbox-close' aria-label='Close'>&times;</button>
+    <div class='rw-lightbox-inner'>
+      <div class='rw-lightbox-media'>
+        <button
+          type='button'
+          class='rw-lightbox-nav rw-lightbox-prev'
+          id='rw-lightbox-prev'
+          aria-label='Previous image'
+        >
+          &#8249;
+        </button>
+        <img id='rw-lightbox-img' src='' alt=''>
+        <button type='button' class='rw-lightbox-nav rw-lightbox-next' id='rw-lightbox-next' aria-label='Next image'>
+          &#8250;
+        </button>
+        <div class='rw-lightbox-thumbs' id='rw-lightbox-thumbs'></div>
+      </div>
+      <div class='rw-lightbox-panel'>
+        <span class='rw-stars' id='rw-lightbox-stars' aria-hidden='true'></span>
+        <div class='rw-lightbox-author'>
+          <div class='rw-avatar' id='rw-lightbox-avatar'></div>
+          <div>
+            <div class='rw-author-name' id='rw-lightbox-name'></div>
+            <div class='rw-count' id='rw-lightbox-date'></div>
+          </div>
+        </div>
+        <p class='rw-item-body' id='rw-lightbox-body'></p>
+      </div>
+    </div>
+  </div>
+
+  {% render 'reviews-modal' %}
+
+  <script src='{{ 'reviews.js' | asset_url }}' defer></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Product Reviews",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Customer Reviews" },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Empty state text",
+      "default": "No reviews yet. Be the first to review this product!"
+    }
+  ]
+}
+{% endschema %}

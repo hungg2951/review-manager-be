@@ -155,4 +155,16 @@ export class ShopService {
       [shopifyDomain],
     );
   }
+
+  /**
+   * Dùng bởi App Proxy — tìm shop theo domain, trả null nếu không thấy
+   * thay vì throw, vì đây là request public cần tự xử lý lỗi rõ ràng hơn.
+   */
+  async findByShopifyDomain(domain: string): Promise<any | null> {
+    const result = await pool.query(
+      `SELECT * FROM "shops" WHERE "id_shopify" = $1 AND "is_active" = true`,
+      [domain],
+    );
+    return result.rows[0] ?? null;
+  }
 }

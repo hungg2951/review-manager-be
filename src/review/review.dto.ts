@@ -20,6 +20,7 @@ export enum ReviewStatus {
 export enum ReviewSource {
   MANUAL = 'manual',
   IMPORT = 'import',
+  STOREFRONT = 'storefront',
 }
 
 export enum ReviewSyncStatus {

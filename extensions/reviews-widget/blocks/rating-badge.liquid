@@ -1,0 +1,21 @@
+{% if product %}
+  {{ 'reviews.css' | asset_url | stylesheet_tag }}
+  {% assign reviews = product.metafields.custom.reviews.value %}
+  {% if reviews.size > 0 %}
+    {% assign total = 0 %}
+    {% for r in reviews %}{% assign total = total | plus: r.rating.value %}{% endfor %}
+    {% assign avg = total | divided_by: reviews.size | divided_by: 1.0 %}
+    <a href="#rw-main" class="rw-badge">
+      <span class="rw-stars" aria-hidden="true">
+        {% for i in (1..5) %}
+          <svg class="rw-star rw-star--sm{% if i <= avg %} rw-star--filled{% endif %}" viewBox="0 0 20 20"><path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/></svg>
+        {% endfor %}
+      </span>
+      <span class="rw-badge-text">{{ avg }} ({{ reviews.size }})</span>
+    </a>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{ "name": "Rating Badge", "target": "section" }
+{% endschema %}

@@ -11,6 +11,7 @@ import { ReviewImageModule } from './review-image/review-image.module';
 import { ReviewSyncProcessorModule } from './review-sync/review-sync-processor.module';
 import { UploadModule } from './upload/upload.module.js';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { AppsProxyModule } from './apps-proxy/apps-proxy.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     ReviewImageModule,
     ReviewSyncProcessorModule,
     UploadModule,
-    WebhooksModule
+    WebhooksModule,
+    AppsProxyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
