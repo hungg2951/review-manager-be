@@ -1,4 +1,10 @@
 let rwGradIdCounter = 0;
+// ─── Star SVG dùng chung cho recap (bước 2) và lightbox ──────────
+const STAR_PATH =
+  'M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z';
+function starSVG(filled) {
+  return `<svg class="rw-star${filled ? ' rw-star--filled' : ''}" viewBox="0 0 20 20"><path d="${STAR_PATH}"></path></svg>`;
+}
 
 function renderPartialStars(avg, sizeClass) {
   let html = '';
@@ -62,7 +68,7 @@ function updateSummaryAfterSubmit(newRating) {
   }
 }
 
-function insertOptimisticReview({ rating, author, title, body }) {
+function insertOptimisticReview({ rating, author, title, body, images }) {
   const list = document.getElementById('rw-list');
   const emptyMsg = document.querySelector('.rw-empty');
   if (!list) return;
@@ -74,10 +80,21 @@ function insertOptimisticReview({ rating, author, title, body }) {
   const safeTitle = title ? escapeHtml(title) : '';
   const safeBody = escapeHtml(body || '');
 
+  const imagesHtml =
+    images && images.length > 0
+      ? `<div class="rw-item-images">${images
+          .map(
+            (url) =>
+              `<img src="${url}" alt="" class="rw-item-image" loading="lazy" width="60" height="60">`,
+          )
+          .join('')}</div>`
+      : '';
+
   const item = document.createElement('div');
   item.className = 'rw-item';
   item.dataset.rating = rating;
   item.dataset.hasImage = 0;
+  item.dataset.hasImage = images && images.length > 0 ? 1 : 0;
   item.dataset.index = -1;
 
   item.innerHTML = `
@@ -91,6 +108,7 @@ function insertOptimisticReview({ rating, author, title, body }) {
     <span class="rw-stars" aria-hidden="true">${starsHtml}</span>
     ${safeTitle ? `<p class="rw-item-title">${safeTitle}</p>` : ''}
     <p class="rw-item-body">${safeBody}</p>
+    ${imagesHtml}
   `;
 
   // Nếu trước đó chưa có review nào (đang hiện "No reviews yet"), ẩn message đó
@@ -216,13 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('rw-form');
   const errorBox = document.getElementById('rw-form-error');
   const submitBtn = document.getElementById('rw-submit-btn');
-
-  // ─── Star SVG dùng chung cho recap (bước 2) và lightbox ──────────
-  const STAR_PATH =
-    'M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z';
-  function starSVG(filled) {
-    return `<svg class="rw-star${filled ? ' rw-star--filled' : ''}" viewBox="0 0 20 20"><path d="${STAR_PATH}"></path></svg>`;
-  }
 
   // ─── Rating picker — dùng event delegation trên container cha ────
   const ratingContainer = document.getElementById('rw-rating-input');
@@ -607,11 +618,16 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.classList.remove('rw-modal-overlay--open');
 
         const submittedRating = Number(ratingInput.value);
+        const previewImageUrls = selectedFiles.map((file) =>
+          URL.createObjectURL(file),
+        );
+
         insertOptimisticReview({
           rating: submittedRating,
           author: formData.get('author_name'),
           title: formData.get('title'),
           body: formData.get('body'),
+          images: previewImageUrls,
         });
         updateSummaryAfterSubmit(submittedRating);
 
