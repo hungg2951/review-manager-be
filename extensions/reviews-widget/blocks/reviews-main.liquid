@@ -112,7 +112,12 @@
             <div class='rw-item-top'>
               <div class='rw-avatar'>{{ review.author_name.value | default: 'A' | slice: 0, 1 | upcase }}</div>
               <div>
-                <div class='rw-author-name'>{{ review.author_name.value | default: 'Anonymous' }}</div>
+                <div class='rw-author-name'>
+                  {{ review.author_name.value | default: 'Anonymous' }}
+                  {% if review.verified.value %}
+                    <span class='rw-verified'>✓ Verified</span>
+                  {% endif %}
+                </div>
               </div>
             </div>
             <span class='rw-stars' aria-hidden='true'>
@@ -167,6 +172,7 @@
         {
           "rating": {{ review.rating.value | default: 0 | json }},
           "author": {{ review.author_name.value | default: 'Anonymous' | json }},
+          "verified": {{ review.verified.value | default: false | json }},
           "date": {{ review.created_at.value | default: '' | json }},
           "body": {{ review.body.value | default: '' | json }},
           "images": [

@@ -310,7 +310,9 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxAvatar.textContent = (review.author || 'A')
       .slice(0, 1)
       .toUpperCase();
-    lightboxName.textContent = review.author || 'Anonymous';
+    lightboxName.innerHTML = review.verified
+      ? `${escapeHtml(review.author || 'Anonymous')} <span class="rw-verified">✓ Verified</span>`
+      : escapeHtml(review.author || 'Anonymous');
     lightboxDate.textContent = review.date || '';
     lightboxDate.style.display = review.date ? '' : 'none';
     lightboxBody.textContent = review.body || '';
@@ -328,6 +330,12 @@ document.addEventListener('DOMContentLoaded', () => {
           `<img src="${img.thumb}" class="rw-lightbox-thumb${i === lbImageIndex ? ' rw-lightbox-thumb--active' : ''}" data-thumb-index="${i}" alt="">`,
       )
       .join('');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   function openLightbox(reviewIndex, imageIndex) {
