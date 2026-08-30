@@ -89,8 +89,6 @@ export class AppsProxyController {
       source: ReviewSource.STOREFRONT,
     });
 
-    console.log('[DEBUG apps-proxy] review.created_at:', review.created_at, typeof review.created_at);
-
     // Upload ảnh kèm theo (nếu có), gắn vào review vừa tạo
     if (files?.length) {
       const urls = await this.uploadService.saveImages(shop.id, files);

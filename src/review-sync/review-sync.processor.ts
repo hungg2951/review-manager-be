@@ -104,7 +104,6 @@ export class ReviewSyncProcessor extends WorkerHost {
     reviewId,
   }: SyncReviewJobData): Promise<void> {
     const review = await this.reviewService.findOne(shopId, reviewId);
-    this.logger.log(`[DEBUG] review.created_at from findOne: ${review.created_at} (${typeof review.created_at})`);
     const images = await this.reviewImageService.findAllByReview(
       shopId,
       reviewId,
