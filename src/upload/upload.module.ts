@@ -7,5 +7,6 @@ import { UploadService } from './upload.service.js';
   imports: [ShopModule], 
   controllers: [UploadController],
   providers: [UploadService],
+  exports: [UploadService],
 })
 export class UploadModule {}
