@@ -1,6 +1,6 @@
 client_id = "48dcb0ed5ad5b69ac085abc384e1f588"
 application_url = "https://admin-manage-reviews.mint-lab.store"
-embedded = true
+embedded = false
 name = "products"
 
 [webhooks]

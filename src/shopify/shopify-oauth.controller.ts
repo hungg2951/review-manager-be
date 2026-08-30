@@ -73,8 +73,6 @@ export class ShopifyOAuthController {
     await this.oauthService.saveShopCredentials(shop, access_token, scope);
 
     // Redirect merchant vào app UI (embedded admin) sau khi cài xong
-    return res.redirect(
-      `https://${shop}/admin/apps/${process.env.SHOPIFY_API_KEY}`,
-    );
+    return res.redirect(process.env.FRONTEND_URL || 'https://your-frontend-domain.com');
   }
 }
