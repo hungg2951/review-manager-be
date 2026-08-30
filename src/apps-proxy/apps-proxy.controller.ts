@@ -84,7 +84,8 @@ export class AppsProxyController {
       title: body.title || undefined,
       author_name: body.author_name || undefined,
       author_email: body.author_email || undefined,
-      status: 'pending' as any,
+      status: 'published' as any,
+      verified: true,
       source: ReviewSource.STOREFRONT,
     });
 

@@ -421,9 +421,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (uploadFilenames) uploadFilenames.textContent = '';
         currentStep = 1;
         showStep(currentStep);
-        alert(
-          'Thank you! Your review has been submitted and is pending approval.',
-        );
+        // alert(
+        //   'Thank you! Your review has been submitted and is pending approval.',
+        // );
       } catch (err) {
         errorBox.textContent =
           err.message || 'Something went wrong. Please try again.';
