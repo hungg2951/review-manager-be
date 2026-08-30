@@ -20,34 +20,39 @@ async function bootstrap() {
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-  // ─── CORS cho App Proxy (/apps/*) ─────────────────────────────────
-  // Request tới các route này đến từ storefront của BẤT KỲ shop nào đã
-  // cài app (domain khác nhau tuỳ merchant, không thể whitelist cứng).
-  // Bảo mật thực sự nằm ở verifyAppProxySignature() trong controller,
-  // nên ở đây chỉ cần cho qua để browser không tự chặn trước khi request
-  // kịp tới hàm verify signature.
-  app.use(
-    '/apps',
-    cors({
-      origin: true, // reflect lại đúng Origin của request, cho phép mọi domain
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      credentials: true,
-      allowedHeaders: ['Content-Type', 'Authorization', 'x-shop-id'],
-    }),
-  );
-
-  // ─── CORS strict cho phần còn lại (admin dashboard, API nội bộ...) ─
-  app.enableCors({
-    origin: (requestOrigin, callback) => {
-      if (!requestOrigin || allowedOrigins.includes(requestOrigin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Origin ${requestOrigin} is not allowed by CORS`));
-      }
-    },
+  const corsOptions = {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'x-shop-id'],
+  };
+
+  // ─── CORS cho App Proxy (/apps/*) — permissive ─────────────────────
+  // Request đến từ storefront của bất kỳ shop nào đã cài app (domain
+  // khác nhau tuỳ merchant). Bảo mật thực sự nằm ở verifyAppProxySignature()
+  // trong controller, nên ở đây cho qua mọi origin.
+  app.use(
+    '/apps',
+    cors({
+      ...corsOptions,
+      origin: true,
+    }),
+  );
+
+  // ─── CORS strict cho phần còn lại (admin dashboard, API nội bộ...) ──
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/apps')) {
+      return next();  
+    }
+    return cors({
+      ...corsOptions,
+      origin: (requestOrigin, callback) => {
+        if (!requestOrigin || allowedOrigins.includes(requestOrigin)) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${requestOrigin} is not allowed by CORS`));
+        }
+      },
+    })(req, res, next);
   });
 
   await app.listen(PORT);
