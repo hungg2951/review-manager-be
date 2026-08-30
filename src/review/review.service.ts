@@ -81,8 +81,8 @@ export class ReviewService {
     const result = await pool.query(
       `INSERT INTO "reviews"
         ("shop_id", "shopify_product_id", "rating", "status", "verified",
-         "author_name", "author_email", "title", "body", "source")
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         "author_name", "author_email", "title", "body", "source", "sync_status")
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending')
        RETURNING *`,
       [
         shopId,
