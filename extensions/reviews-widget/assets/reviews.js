@@ -203,18 +203,100 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ─── Dropzone upload ảnh (kéo-thả + hiện tên file đã chọn) ────────
+  // ─── Upload ảnh: validate định dạng + preview + cho xoá từng ảnh ───
   const uploadDropzone = document.getElementById('rw-upload-dropzone');
   const uploadInput = document.getElementById('rw-input-images');
-  const uploadFilenames = document.getElementById('rw-upload-filenames');
+  const uploadPreviews = document.getElementById('rw-upload-previews');
+  const uploadError = document.getElementById('rw-upload-error');
 
-  function renderFilenames() {
-    if (!uploadInput || !uploadFilenames) return;
-    const names = Array.from(uploadInput.files || []).map((f) => f.name);
-    uploadFilenames.textContent = names.join(', ');
+  const ALLOWED_TYPES = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/heic',
+    'image/heif',
+  ];
+  const MAX_FILES = 5;
+
+  // Giữ danh sách file hợp lệ ở đây (không dùng thẳng input.files vì
+  // FileList là read-only, không thể xoá từng phần tử trực tiếp).
+  let selectedFiles = [];
+
+  function showUploadError(message) {
+    if (!uploadError) return;
+    uploadError.textContent = message;
+    uploadError.hidden = false;
+  }
+
+  function clearUploadError() {
+    if (uploadError) uploadError.hidden = true;
+  }
+
+  // Đồng bộ selectedFiles → input.files thật, để form submit lấy đúng
+  // danh sách file đã lọc (dùng DataTransfer vì không gán trực tiếp
+  // FileList được).
+  function syncInputFiles() {
+    const dt = new DataTransfer();
+    selectedFiles.forEach((file) => dt.items.add(file));
+    uploadInput.files = dt.files;
+  }
+
+  function renderPreviews() {
+    uploadPreviews.innerHTML = '';
+    selectedFiles.forEach((file, index) => {
+      const url = URL.createObjectURL(file);
+      const item = document.createElement('div');
+      item.className = 'rw-upload-preview-item';
+      item.innerHTML = `
+      <img src="${url}" alt="">
+      <button type="button" class="rw-upload-preview-remove" data-index="${index}" aria-label="Remove image">&times;</button>
+    `;
+      uploadPreviews.appendChild(item);
+    });
+  }
+
+  function handleNewFiles(fileList) {
+    clearUploadError();
+    const incoming = Array.from(fileList || []);
+    const rejected = [];
+
+    incoming.forEach((file) => {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        rejected.push(file.name);
+        return;
+      }
+      if (selectedFiles.length >= MAX_FILES) {
+        rejected.push(`${file.name} (đã đạt tối đa ${MAX_FILES} ảnh)`);
+        return;
+      }
+      selectedFiles.push(file);
+    });
+
+    if (rejected.length > 0) {
+      showUploadError(
+        `Không hỗ trợ hoặc vượt giới hạn: ${rejected.join(', ')}. Chỉ chấp nhận JPEG, PNG, WEBP, HEIC.`,
+      );
+    }
+
+    syncInputFiles();
+    renderPreviews();
   }
 
   if (uploadInput) {
-    uploadInput.addEventListener('change', renderFilenames);
+    uploadInput.addEventListener('change', () => {
+      handleNewFiles(uploadInput.files);
+    });
+  }
+
+  if (uploadPreviews) {
+    uploadPreviews.addEventListener('click', (e) => {
+      const btn = e.target.closest('.rw-upload-preview-remove');
+      if (!btn) return;
+      const index = Number(btn.dataset.index);
+      selectedFiles.splice(index, 1);
+      syncInputFiles();
+      renderPreviews();
+    });
   }
 
   if (uploadDropzone && uploadInput) {
@@ -233,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
     uploadDropzone.addEventListener('drop', (e) => {
       const files = e.dataTransfer?.files;
       if (files && files.length) {
-        uploadInput.files = files;
-        renderFilenames();
+        // Kéo-thả không bị lọc bởi accept attribute, nên bắt buộc validate ở đây
+        handleNewFiles(files);
       }
     });
   }
@@ -426,7 +508,9 @@ document.addEventListener('DOMContentLoaded', () => {
           .querySelectorAll('.rw-star-pick')
           .forEach((s) => s.classList.remove('rw-star--filled'));
         if (recapStars) recapStars.innerHTML = '';
-        if (uploadFilenames) uploadFilenames.textContent = '';
+        selectedFiles = [];
+        if (uploadPreviews) uploadPreviews.innerHTML = '';
+        if (uploadInput) uploadInput.value = '';
         currentStep = 1;
         showStep(currentStep);
         // alert(

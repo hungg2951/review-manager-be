@@ -99,9 +99,17 @@
             <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
           </svg>
           <span><strong>Click to upload</strong> or drag and drop</span>
-          <input type='file' id='rw-input-images' name='images' accept='image/*' multiple hidden>
+          <input
+            type='file'
+            id='rw-input-images'
+            name='images'
+            accept='image/jpeg,image/png,image/webp,image/heic,image/heif'
+            multiple
+            hidden
+          >
         </label>
-        <p class='rw-upload-filenames' id='rw-upload-filenames'></p>
+        <div class='rw-upload-previews' id='rw-upload-previews'></div>
+        <p class='rw-upload-error' id='rw-upload-error' hidden></p>
       </div>
 
       <div class='rw-form-error' id='rw-form-error' hidden></div>

@@ -6,28 +6,31 @@
   <div class='rw-main' id='rw-main' data-shop='{{ shop.permanent_domain }}' data-product-id='{{ product.id }}'>
     <div class='rw-top'>
       <div class='rw-summary-block'>
-        {% if reviews.size > 0 %}
-          {% assign total = 0 %}
-          {% for r in reviews -%}
-            {%- assign total = total | plus: r.rating.value -%}
-          {%- endfor %}
-          {% assign avg = total | divided_by: reviews.size | divided_by: 1.0 %}
-          <div class='rw-avg'>{{ avg }}</div>
-          <div>
-            <span class='rw-stars' aria-hidden='true'>
-              {% for i in (1..5) %}
-                <svg class='rw-star{% if i <= avg %} rw-star--filled{% endif %}' viewBox='0 0 20 20'>
-                  <path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/>
-                </svg>
-              {% endfor %}
-            </span>
-            <div class='rw-count'>
-              {{ reviews.size }} review{% if reviews.size != 1 %}s{% endif %}
-            </div>
-          </div>
-        {% else %}
+        <div>
           <h3 class='rw-title'>{{ block.settings.heading | default: 'Customer Reviews' }}</h3>
-        {% endif %}
+          {% if reviews.size > 0 %}
+            {% assign total = 0 %}
+            {% for r in reviews -%}
+              {%- assign total = total | plus: r.rating.value -%}
+            {%- endfor %}
+            {% assign avg = total | divided_by: reviews.size | divided_by: 1.0 %}
+            <div class='rw-summary-rating'>
+              <div class='rw-avg'>{{ avg }}</div>
+              <div>
+                <span class='rw-stars' aria-hidden='true'>
+                  {% for i in (1..5) %}
+                    <svg class='rw-star{% if i <= avg %} rw-star--filled{% endif %}' viewBox='0 0 20 20'>
+                      <path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3L1 7.4l6.4-.6z"/>
+                    </svg>
+                  {% endfor %}
+                </span>
+                <div class='rw-count'>
+                  {{ reviews.size }} review{% if reviews.size != 1 %}s{% endif %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
       </div>
       <div class='rw-actions'>
         <button type='button' class='rw-btn-primary' id='rw-open-modal'>Write a review</button>
