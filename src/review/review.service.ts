@@ -11,6 +11,15 @@ export interface FindAllReviewsQuery {
   shopify_product_id?: string;
   status?: string;
   sync_status?: string;
+  page?: string | number;
+  limit?: string | number;
+}
+
+export interface PaginatedReviews {
+  data: any[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 @Injectable()
@@ -18,14 +27,28 @@ export class ReviewService {
   constructor(private readonly reviewSyncProducer: ReviewSyncProducerService) {}
 
   /**
-   * Get reviews của 1 shop, newest first. shopId luôn bắt buộc — lấy từ
-   * @ShopId() decorator ở controller, không nhận qua query để tránh client
-   * tự đổi shop_id xem dữ liệu shop khác.
+   * Get reviews của 1 shop, newest first, phân trang 1 item / trang.
+   * shopId luôn bắt buộc — lấy từ @ShopId() decorator ở controller.
    */
   async findAll(
     shopId: string,
     query: FindAllReviewsQuery = {},
-  ): Promise<any[]> {
+  ): Promise<PaginatedReviews> {
+    const DEFAULT_PAGE_SIZE = 10;
+    const MAX_PAGE_SIZE = 100; // chặn FE truyền limit=999999 làm sập DB
+
+    const pageSize = Math.min(
+      MAX_PAGE_SIZE,
+      Math.max(
+        1,
+        parseInt(String(query.limit ?? DEFAULT_PAGE_SIZE), 10) ||
+          DEFAULT_PAGE_SIZE,
+      ),
+    );
+    const page = Math.max(1, parseInt(String(query.page ?? '1'), 10) || 1);
+    const offset = (page - 1) * pageSize;
+
+    // Build WHERE conditions
     const conditions: string[] = [`"shop_id" = $1`];
     const values: any[] = [shopId];
     let paramIndex = 2;
@@ -48,12 +71,30 @@ export class ReviewService {
       paramIndex++;
     }
 
-    const result = await pool.query(
-      `SELECT * FROM "reviews" WHERE ${conditions.join(' AND ')} ORDER BY "created_at" DESC`,
+    const whereClause = conditions.join(' AND ');
+
+    // Đếm tổng số bản ghi thoả điều kiện (để FE biết có bao nhiêu trang)
+    const countResult = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM "reviews" WHERE ${whereClause}`,
       values,
     );
+    const total = countResult.rows[0].count;
 
-    return result.rows;
+    // Lấy đúng 1 bản ghi của trang hiện tại
+    const dataResult = await pool.query(
+      `SELECT * FROM "reviews"
+       WHERE ${whereClause}
+       ORDER BY "created_at" DESC
+       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+      [...values, pageSize, offset],
+    );
+
+    return {
+      data: dataResult.rows,
+      total,
+      page,
+      pageSize,
+    };
   }
 
   /**

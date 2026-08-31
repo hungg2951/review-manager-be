@@ -12,8 +12,6 @@ import { ShopId } from '../common/decorators/shop-id.decorator.js';
 import { ReviewService } from './review.service.js';
 import type { CreateReviewDto, UpdateReviewDto } from './review.dto.js';
 import type { FindAllReviewsQuery } from './review.service.js';
-import { CurrentUser } from '../common/decorators/user.decorator.js';
-import type { JwtPayload } from '../common/decorators/user.decorator.js';
 
 @Controller('reviews')
 export class ReviewController {
