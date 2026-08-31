@@ -451,29 +451,50 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
       uploadPreviews.appendChild(item);
     });
+
+    const counterEl = document.getElementById('rw-upload-counter');
+    const overLimit = selectedFiles.length > MAX_FILES;
+    if (counterEl) {
+      counterEl.textContent = `${selectedFiles.length} / ${MAX_FILES} photos selected`;
+      counterEl.classList.toggle('rw-upload-counter--over', overLimit);
+    }
+
+    if (submitBtn) submitBtn.disabled = overLimit;
+    if (overLimit) {
+      showUploadError(
+        `You've selected ${selectedFiles.length} photos, but the maximum is ${MAX_FILES}. Please remove ${selectedFiles.length - MAX_FILES} photo(s) to continue.`,
+      );
+    } else {
+      clearUploadError();
+    }
+
+    const atLimit = selectedFiles.length >= MAX_FILES;
+    if (uploadDropzone) {
+      uploadDropzone.style.opacity = atLimit ? '0.5' : '';
+      uploadDropzone.style.pointerEvents = atLimit ? 'none' : '';
+    }
   }
 
   function handleNewFiles(fileList) {
     clearUploadError();
     const incoming = Array.from(fileList || []);
-    const rejected = [];
+    const invalidType = [];
 
     incoming.forEach((file) => {
       if (!ALLOWED_TYPES.includes(file.type)) {
-        rejected.push(file.name);
-        return;
-      }
-      if (selectedFiles.length >= MAX_FILES) {
-        rejected.push(`${file.name} (đã đạt tối đa ${MAX_FILES} ảnh)`);
+        invalidType.push(file.name);
         return;
       }
       selectedFiles.push(file);
     });
-
-    if (rejected.length > 0) {
-      showUploadError(
-        `Không hỗ trợ hoặc vượt giới hạn: ${rejected.join(', ')}. Chỉ chấp nhận JPEG, PNG, WEBP, HEIC.`,
+    const messages = [];
+    if (invalidType.length > 0) {
+      messages.push(
+        `Unsupported format: ${invalidType.join(', ')}. Only JPEG, PNG, WEBP, HEIC are allowed.`,
       );
+    }
+    if (messages.length > 0) {
+      showUploadError(messages.join(' '));
     }
 
     syncInputFiles();
@@ -524,6 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentStep = 1;
       showStep(currentStep);
       overlay.classList.add('rw-modal-overlay--open');
+      if (submitBtn) submitBtn.disabled = false;
     });
   }
   if (closeBtn) {
@@ -677,6 +699,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      if (selectedFiles.length > MAX_FILES) {
+        errorBox.textContent = `You can only upload up to ${MAX_FILES} photos. Please remove ${selectedFiles.length - MAX_FILES} photo(s).`;
+        errorBox.hidden = false;
+        return;
+      }
+
       const formData = new FormData(form);
       formData.set('shopify_product_id', productGid);
 
@@ -721,6 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedFiles = [];
         if (uploadPreviews) uploadPreviews.innerHTML = '';
         if (uploadInput) uploadInput.value = '';
+        if (submitBtn) submitBtn.disabled = false;
         currentStep = 1;
         showStep(currentStep);
         // alert(
